@@ -3,6 +3,6 @@
 
 int main() {
     std::cout << "Staring OBJ File Read!" << std::endl;
-    readObjFile();
+    ParseObjFile();
     return 0;
 }
