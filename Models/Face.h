@@ -4,6 +4,7 @@ public:
     int x;
     int y;
     int z;
+    int lineIndex;
 
     static Face parseFace(const std::string& x, const std::string& y, const std::string& z){
         return Face(stoi(x), stoi(y), stoi(z));

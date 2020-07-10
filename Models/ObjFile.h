@@ -18,19 +18,25 @@ public:
     std::vector< std::string > Lines;
     std::vector< Face > Faces;
     std::vector< Vertex > Vertices;
+    std::vector<std::vector<Vertex> > DuplicateVertices;
 
     void read();
 private:
     std::ifstream _fileStream;
 
-    void parseObjLine(const std::string& line);
+    void parseObjLine(const std::string &line, int lineIndex);
+    void summarize() const;
 };
 
 ObjFile::ObjFile(std::string path){
     ObjFile::FilePath = std::move(path);
+    ObjFile::read();
+    ObjFile::DuplicateVertices = Vertex::getDuplicates(Vertices);
+    ObjFile::summarize();
 }
 
 void ObjFile::read() {
+    int lineIndex = 1;
     std::string objLine;
     _fileStream.open(FilePath);
 
@@ -42,17 +48,22 @@ void ObjFile::read() {
 
     // Get Lines, and parse
     while (getline(_fileStream, objLine)) {
-        parseObjLine(objLine);
+        parseObjLine(objLine, lineIndex);
         Lines.push_back(objLine);
+        lineIndex++;
     }
 
     _fileStream.close();
+}
+
+void ObjFile::summarize() const {
     std::cout << "Finished Reading: " << Lines.size() << " Lines" << std::endl;
     std::cout << "Vertices: " << Vertices.size() << std::endl;
+    std::cout << "Duplicate Vertices: " << DuplicateVertices.size() << std::endl;
     std::cout << "Faces: " << Faces.size() << std::endl;
 }
 
-void ObjFile::parseObjLine(const std::string& line) {
+void ObjFile::parseObjLine(const std::string &line, int lineIndex) {
     std::smatch objMatch;
     std::regex objRegex(R"(([vf])\s([-\d]+[\d\.]+)\s([-\d]+[\d\.]+)\s([-\d]+[\d\.]+))");
     std::string type;
@@ -64,11 +75,13 @@ void ObjFile::parseObjLine(const std::string& line) {
     // Convert to classes
     if (type == "v"){
         Vertex vert = Vertex::parseVertex(objMatch[2], objMatch[3], objMatch[4]);
+        vert.lineIndex = lineIndex;
         Vertices.push_back(vert);
         std::cout << type << " " << vert.x << " " << vert.y << " " << vert.z << std::endl;
     }
     else if (type == "f"){
         Face fa = Face::parseFace(objMatch[2], objMatch[3], objMatch[4]);
+        fa.lineIndex = lineIndex;
         Faces.push_back(fa);
         std::cout << type << " " << fa.x << " " << fa.y << " " << fa.z << std::endl;
     }
