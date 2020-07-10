@@ -21,22 +21,20 @@ public:
     std::vector<std::string> Lines;
     std::vector<Face> Faces;
     std::vector<Vertex> Vertices;
-    std::vector<std::vector<Vertex> > DuplicateVertices;
+    int DuplicateVertices;
 
 private:
     std::ifstream _fileStream;
 
     void read();
-
     void parseObjLine(const std::string &line, int lineIndex);
-
     void summarize() const;
 };
 
 ObjFile::ObjFile(std::string path) {
     ObjFile::FilePath = std::move(path);
     ObjFile::read();
-    ObjFile::DuplicateVertices = Vertex::getDuplicates(Vertices);
+    ObjFile::DuplicateVertices = Vertex::parseDuplicates(Vertices);
     ObjFile::summarize();
 }
 
@@ -64,7 +62,7 @@ void ObjFile::read() {
 void ObjFile::summarize() const {
     std::cout << "Finished Reading: " << Lines.size() << " Lines" << std::endl;
     std::cout << "Vertices: " << Vertices.size() << std::endl;
-    std::cout << "Duplicate Vertices: " << DuplicateVertices.size() << std::endl;
+    std::cout << "Duplicate Vertices: " << DuplicateVertices << std::endl;
     std::cout << "Faces: " << Faces.size() << std::endl;
 }
 
