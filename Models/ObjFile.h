@@ -23,7 +23,7 @@ public:
 private:
     std::ifstream _fileStream;
 
-    void parseObjLine(const std::string& basicString);
+    void parseObjLine(const std::string& line);
 };
 
 ObjFile::ObjFile(std::string path){
@@ -32,7 +32,6 @@ ObjFile::ObjFile(std::string path){
 
 void ObjFile::read() {
     std::string objLine;
-
     _fileStream.open(FilePath);
 
     // Terminate if file can't be opened
@@ -41,7 +40,7 @@ void ObjFile::read() {
         exit(1); // terminate with error
     }
 
-    // Get Lines
+    // Get Lines, and parse
     while (getline(_fileStream, objLine)) {
         parseObjLine(objLine);
         Lines.push_back(objLine);
@@ -49,6 +48,8 @@ void ObjFile::read() {
 
     _fileStream.close();
     std::cout << "Finished Reading: " << Lines.size() << " Lines" << std::endl;
+    std::cout << "Vertices: " << Vertices.size() << std::endl;
+    std::cout << "Faces: " << Faces.size() << std::endl;
 }
 
 void ObjFile::parseObjLine(const std::string& line) {
