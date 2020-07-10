@@ -12,6 +12,10 @@ public:
     double x;
     double y;
     double z;
+
+    static Vertex parseVertex(const std::string& x, const std::string& y, const std::string& z){
+        return Vertex(std::stod(x), std::stod(y), std::stod(z));
+    }
 };
 
 Vertex::Vertex(double x, double y, double z){

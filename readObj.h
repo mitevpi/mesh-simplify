@@ -3,12 +3,10 @@
 #include <fstream>
 #include <vector>
 #include <regex>
-#include "Vertex.h"
-#include "Face.h"
+#include "Models/Vertex.h"
+#include "Models/Face.h"
 
 void parseObjLine(const std::string& line);
-Vertex parseVertex(const std::string& x, const std::string& y, const std::string& z);
-Face parseFace(const std::string& x, const std::string& y, const std::string& z);
 
 void readObjFile() {
     int count = 0;
@@ -44,19 +42,14 @@ void parseObjLine(const std::string& line){
 
     // Convert to classes
     if (type == "v"){
-        Vertex vert = parseVertex(objMatch[2], objMatch[3], objMatch[4]);
+        Vertex vert = Vertex::parseVertex(objMatch[2], objMatch[3], objMatch[4]);
         std::cout << type << " " << vert.x << " " << vert.y << " " << vert.z << std::endl;
     }
     else if (type == "f"){
-        Face fa = parseFace(objMatch[2], objMatch[3], objMatch[4]);
+        Face fa = Face::parseFace(objMatch[2], objMatch[3], objMatch[4]);
         std::cout << type << " " << fa.x << " " << fa.y << " " << fa.z << std::endl;
     }
 }
 
-Vertex parseVertex(const std::string& x, const std::string& y, const std::string& z){
-    return Vertex(std::stod(x), std::stod(y), std::stod(z));
-}
 
-Face parseFace(const std::string& x, const std::string& y, const std::string& z){
-    return Face(stoi(x), stoi(y), stoi(z));
-}
+
