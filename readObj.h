@@ -5,30 +5,17 @@
 #include <regex>
 #include "Models/Vertex.h"
 #include "Models/Face.h"
+#include "Models/ObjFile.h"
+
 
 void parseObjLine(const std::string& line);
 
 void readObjFile() {
     int count = 0;
-    std::string objLine;
-    std::ifstream inFile;
+    std::string filePath = "/Users/mitevpi/Dropbox/Work/010_Project Files/200522_Mesh Simplification/TopographyMesh.obj";
 
-    inFile.open("/Users/mitevpi/Dropbox/Work/010_Project Files/200522_Mesh Simplification/TopographyMesh.obj");
-
-    // Terminate if file can't be opened
-    if (!inFile) {
-        std::cout << "Unable to open file";
-        exit(1); // terminate with error
-    }
-
-    // Get lines
-    while (getline(inFile, objLine)) {
-        parseObjLine(objLine);
-        count++;
-    }
-
-    inFile.close();
-    std::cout << "Finished Reading: " << count << " Lines"  << std::endl;
+    ObjFile of = ObjFile(filePath);
+    of.read();
 }
 
 void parseObjLine(const std::string& line){
