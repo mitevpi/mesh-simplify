@@ -13,22 +13,27 @@
 
 class ObjFile {
 public:
+    /// Read the OBJ file at the path and create an instance of this class.
+    /// @param path the filepath of the OBJ File
     explicit ObjFile(std::string path);
+
     std::string FilePath;
-    std::vector< std::string > Lines;
-    std::vector< Face > Faces;
-    std::vector< Vertex > Vertices;
+    std::vector<std::string> Lines;
+    std::vector<Face> Faces;
+    std::vector<Vertex> Vertices;
     std::vector<std::vector<Vertex> > DuplicateVertices;
 
-    void read();
 private:
     std::ifstream _fileStream;
 
+    void read();
+
     void parseObjLine(const std::string &line, int lineIndex);
+
     void summarize() const;
 };
 
-ObjFile::ObjFile(std::string path){
+ObjFile::ObjFile(std::string path) {
     ObjFile::FilePath = std::move(path);
     ObjFile::read();
     ObjFile::DuplicateVertices = Vertex::getDuplicates(Vertices);
@@ -73,17 +78,16 @@ void ObjFile::parseObjLine(const std::string &line, int lineIndex) {
     type = objMatch[1];
 
     // Convert to classes
-    if (type == "v"){
+    if (type == "v") {
         Vertex vert = Vertex::parseVertex(objMatch[2], objMatch[3], objMatch[4]);
         vert.lineIndex = lineIndex;
         Vertices.push_back(vert);
-        std::cout << type << " " << vert.x << " " << vert.y << " " << vert.z << std::endl;
-    }
-    else if (type == "f"){
+//        std::cout << type << " " << vert.x << " " << vert.y << " " << vert.z << std::endl;
+    } else if (type == "f") {
         Face fa = Face::parseFace(objMatch[2], objMatch[3], objMatch[4]);
         fa.lineIndex = lineIndex;
         Faces.push_back(fa);
-        std::cout << type << " " << fa.x << " " << fa.y << " " << fa.z << std::endl;
+//        std::cout << type << " " << fa.x << " " << fa.y << " " << fa.z << std::endl;
     }
 }
 
