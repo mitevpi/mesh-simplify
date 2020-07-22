@@ -10,6 +10,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <map>
 
 class ObjFile {
 public:
@@ -18,13 +19,15 @@ public:
     explicit ObjFile(std::string path);
 
     std::string FilePath;
-    std::vector<std::string> Lines;
     std::vector<Face> Faces;
     std::vector<Vertex> Vertices;
     int DuplicateVertices;
+    int LineCount = 0;
+    void write();
 
 private:
-    std::ifstream _fileStream;
+    std::ifstream _fileStreamRead;
+    std::ofstream _fileStreamWrite;
 
     void read();
     void parseObjLine(const std::string &line, int lineIndex);
@@ -38,32 +41,65 @@ ObjFile::ObjFile(std::string path) {
     ObjFile::summarize();
 }
 
+/**
+ * Read an OBJ file line-by-line and parse the Face and Vertex data into
+ * appropriate model classes.
+ */
 void ObjFile::read() {
     int lineIndex = 1;
     std::string objLine;
-    _fileStream.open(FilePath);
+    _fileStreamRead.open(FilePath);
 
     // Terminate if file can't be opened
-    if (!_fileStream) {
+    if (!_fileStreamRead) {
         std::cout << "Unable to open file";
         exit(1); // terminate with error
     }
 
     // Get Lines, and parse
-    while (getline(_fileStream, objLine)) {
+    while (getline(_fileStreamRead, objLine)) {
         parseObjLine(objLine, lineIndex);
-        Lines.push_back(objLine);
         lineIndex++;
+        LineCount++;
     }
 
-    _fileStream.close();
+    _fileStreamRead.close();
+}
+
+void ObjFile::write() {
+    std::string NewPath = FilePath.substr(0, FilePath.find_last_of("\\/")) + "\\Simplified.obj";
+    std::cout << "Starting to Write: " << LineCount << " Lines" << std::endl;
+    _fileStreamWrite.open(NewPath);
+
+    std::map<int, int> vLookupTable;
+
+    // write vertices
+    for (auto v : Vertices) {
+        if (v.pointTo == -1) {
+            _fileStreamWrite << "v " << v.x << " " << v.y << " " << v.z << std::endl;
+        } else {
+            vLookupTable[v.lineIndex] = v.pointTo;
+        }
+    }
+
+    // write faces
+    int fx, fy, fz;
+    for (auto f: Faces){
+        fx = ( vLookupTable.count(f.x) > 0 ) ? vLookupTable[f.x] : f.x;
+        fy = ( vLookupTable.count(f.y) > 0 ) ? vLookupTable[f.y] : f.y;
+        fz = ( vLookupTable.count(f.z) > 0 ) ? vLookupTable[f.z] : f.z;
+
+        _fileStreamWrite << "f " << fx << " " << fy << " " << fz << std::endl;
+    }
+
+    _fileStreamWrite.close();
 }
 
 /**
  * Print ou a summary of the OBJ File and performed operations on the console.
  */
 void ObjFile::summarize() const {
-    std::cout << "Finished Reading: " << Lines.size() << " Lines" << std::endl;
+    std::cout << "Finished Reading: " << LineCount << " Lines" << std::endl;
     std::cout << "Vertices: " << Vertices.size() << std::endl;
     std::cout << "Duplicate Vertices: " << DuplicateVertices << std::endl;
     std::cout << "Faces: " << Faces.size() << std::endl;
@@ -71,7 +107,8 @@ void ObjFile::summarize() const {
 
 void ObjFile::parseObjLine(const std::string &line, int lineIndex) {
     std::smatch objMatch;
-    std::regex objRegex(R"(([vf])\s([-\d]+[\d\.]+)\s([-\d]+[\d\.]+)\s([-\d]+[\d\.]+))");
+//    std::regex objRegex(R"(([vf])\s([-\d]+[\d\.]+)\s([-\d]+[\d\.]+)\s([-\d]+[\d\.]+))");
+    std::regex objRegex(R"(([vf])\s([-\d\.]+)\s([-\d\.]+)\s([-\d\.]+))");
     std::string type;
 
     // Get regex matches
