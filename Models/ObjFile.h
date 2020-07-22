@@ -59,6 +59,9 @@ void ObjFile::read() {
     _fileStream.close();
 }
 
+/**
+ * Print ou a summary of the OBJ File and performed operations on the console.
+ */
 void ObjFile::summarize() const {
     std::cout << "Finished Reading: " << Lines.size() << " Lines" << std::endl;
     std::cout << "Vertices: " << Vertices.size() << std::endl;
@@ -80,12 +83,10 @@ void ObjFile::parseObjLine(const std::string &line, int lineIndex) {
         Vertex vert = Vertex::parseVertex(objMatch[2], objMatch[3], objMatch[4]);
         vert.lineIndex = lineIndex;
         Vertices.push_back(vert);
-//        std::cout << type << " " << vert.x << " " << vert.y << " " << vert.z << std::endl;
     } else if (type == "f") {
         Face fa = Face::parseFace(objMatch[2], objMatch[3], objMatch[4]);
         fa.lineIndex = lineIndex;
         Faces.push_back(fa);
-//        std::cout << type << " " << fa.x << " " << fa.y << " " << fa.z << std::endl;
     }
 }
 

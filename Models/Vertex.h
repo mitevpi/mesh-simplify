@@ -38,6 +38,11 @@ public:
         return duplicated;
     }
 
+    /**
+     * Main method for finding duplicates in an array of Vertices.
+     * @param vertices An array of Vertex elements.
+     * @return The amount of vertices which are duplicated 1 or more times.
+     */
     static int parseDuplicates(std::vector<Vertex> &vertices) {
         int duplicatedCount = 0;
         for (auto v : vertices) {
@@ -57,6 +62,12 @@ public:
     }
 };
 
+/**
+ * Construct a Vertex class from known coordinates.
+ * @param x Vertex X Coordinate.
+ * @param y Vertex y Coordinate.
+ * @param zVertex z Coordinate.
+ */
 Vertex::Vertex(double x, double y, double z) {
     Vertex::x = x;
     Vertex::y = y;

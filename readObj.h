@@ -9,7 +9,7 @@
 
 void ParseObjFile() {
 //    std::string filePath = "/Users/mitevpi/Dropbox/Work/010_Project Files/200522_Mesh Simplification/TopoMeshCustom.obj";
-    std::string filePath = "/Users/mitevpi/Dropbox/Work/010_Project Files/200522_Mesh Simplification/GenericModels.obj";
+    std::string filePath = R"(C:\Users\pmitev\Dropbox\Work\010_Project Files\200522_Mesh Simplification\TopoMeshCustom.obj)";
 
     ObjFile of = ObjFile(filePath);
 }
