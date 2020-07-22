@@ -15,41 +15,71 @@ public:
     double x;
     double y;
     double z;
-    int lineIndex;
+    int lineIndex{};
+    int pointTo = -1;
 
     static Vertex parseVertex(const std::string &x, const std::string &y, const std::string &z) {
         return Vertex(std::stod(x), std::stod(y), std::stod(z));
     }
 
-    static std::vector<Vertex> getDuplicates(Vertex vertex, const std::vector<Vertex> &vertices) {
-        std::vector<Vertex> duplicates;
-        for (auto v : vertices) {
-            if (v.lineIndex != vertex.lineIndex){
-                if (approximatelyEqual(v.x, vertex.x) && approximatelyEqual(v.y, vertex.y) &&
-                    approximatelyEqual(v.z, vertex.z)) {
-                    duplicates.push_back(v);
+    /**
+     * Low-level method for finding duplicates of a Vertex in an array of Vertices
+     * @param vertexA The vertex to find duplicates of.
+     * @param vertices The array of vertices to search for duplicates in.
+     * @return Whether or not there were any instances of duplication.
+     */
+    static bool parseDuplicates(Vertex vertexA, std::vector<Vertex> &vertices) {
+        bool duplicated = false;
+
+        // check if it already has been flagged as a duplicate
+        if (vertexA.pointTo > 0){
+            return duplicated;
+        }
+        for (Vertex& vertexB : vertices) {
+            // if both vertices aren't the same one (based on index) and if the vertex
+            // to check has not already been flagged as a duplicate
+            if (vertexB.lineIndex != vertexA.lineIndex){
+                if (approximatelyEqual(vertexB.x, vertexA.x) && approximatelyEqual(vertexB.y, vertexA.y) &&
+                    approximatelyEqual(vertexB.z, vertexA.z)) {
+                    vertexB.pointTo = vertexA.lineIndex;
+                    duplicated = true;
                 }
             }
         }
-        return duplicates;
+        return duplicated;
     }
 
-    static bool approximatelyEqual(double a, double b, double epsilon = 0.01) {
+    /**
+     * Main method for finding duplicates in an array of Vertices.
+     * @param vertices An array of Vertex elements.
+     * @return The amount of vertices which are duplicated 1 or more times.
+     */
+    static int parseDuplicates(std::vector<Vertex> &vertices) {
+        int duplicatedCount = 0;
+        for (auto v : vertices) {
+
+            bool duplicated = Vertex::parseDuplicates(v, vertices);
+
+            if (duplicated){
+                duplicatedCount++;
+            }
+        }
+        return duplicatedCount;
+    }
+
+
+    static bool approximatelyEqual(double a, double b, double epsilon = 0.001) {
         bool result = fabs(a - b) <= ((fabs(a) < fabs(b) ? fabs(b) : fabs(a)) * epsilon);
         return result;
     }
-
-    static std::vector<std::vector<Vertex> > getDuplicates(std::vector<Vertex> &vertices) {
-        std::vector<std::vector<Vertex> > allDuplicates;
-        for (auto v : vertices) {
-            std::vector<Vertex> duplicates = Vertex::getDuplicates(v, vertices);
-            allDuplicates.push_back(duplicates);
-        }
-
-        return allDuplicates;
-    }
 };
 
+/**
+ * Construct a Vertex class from known coordinates.
+ * @param x Vertex X Coordinate.
+ * @param y Vertex y Coordinate.
+ * @param zVertex z Coordinate.
+ */
 Vertex::Vertex(double x, double y, double z) {
     Vertex::x = x;
     Vertex::y = y;
