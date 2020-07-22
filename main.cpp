@@ -3,19 +3,17 @@
 #include "ParseOBJ.h"
 
 int main() {
-    // Get starting timepoint
+    // Get starting time
     std::string filePath;
-    auto start = std::chrono::high_resolution_clock::now();
     std::cout << "Input Path of OBJ File to Simplify" << std::endl;
 
     getline (std::cin, filePath);
-    ParseObjFile(filePath);
     std::cout << "Staring OBJ File Read!" << std::endl;
+    auto start = std::chrono::high_resolution_clock::now();
+    ParseObjFile(filePath);
 
-    // Get ending timepoint
+    // Get ending time and compute duration
     auto stop = std::chrono::high_resolution_clock::now();
-
-    // Get duration. Substart timepoints to get durarion.
     auto duration = duration_cast<std::chrono::microseconds>(stop - start);
 
     std::cout << "Execution Time: " << duration.count() << " microseconds" << std::endl;

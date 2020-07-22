@@ -56,7 +56,7 @@ public:
     }
 
 
-    static bool approximatelyEqual(double a, double b, double epsilon = 0.01) {
+    static bool approximatelyEqual(double a, double b, double epsilon = 0.001) {
         bool result = fabs(a - b) <= ((fabs(a) < fabs(b) ? fabs(b) : fabs(a)) * epsilon);
         return result;
     }
