@@ -23,6 +23,7 @@ public:
     std::vector<Vertex> Vertices;
     int DuplicateVertices;
     int LineCount = 0;
+
     void write();
 
 private:
@@ -30,10 +31,16 @@ private:
     std::ofstream _fileStreamWrite;
 
     void read();
+
     void parseObjLine(const std::string &line, int lineIndex);
+
     void summarize() const;
 };
 
+/**
+ * Create an instance of the ObjFile class.
+ * @param path The file path of the OBJ file.
+ */
 ObjFile::ObjFile(std::string path) {
     ObjFile::FilePath = std::move(path);
     ObjFile::read();
@@ -66,32 +73,40 @@ void ObjFile::read() {
     _fileStreamRead.close();
 }
 
+/**
+ * Write a simplified version of the original OBJ file in the source directory.
+ */
 void ObjFile::write() {
     std::string NewPath = FilePath.substr(0, FilePath.find_last_of("\\/")) + "\\Simplified.obj";
     std::cout << "Starting to Write: " << LineCount << " Lines" << std::endl;
     _fileStreamWrite.open(NewPath);
 
+    // original index, new index
     std::map<int, int> vLookupTable;
 
     // write vertices
+    int vIndex = 1;
+    int skipped = 0;
     for (auto v : Vertices) {
         if (v.pointTo == -1) {
             _fileStreamWrite << "v " << v.x << " " << v.y << " " << v.z << std::endl;
+            vLookupTable[vIndex] = vIndex - skipped;
         } else {
-            vLookupTable[v.lineIndex] = v.pointTo;
+            vLookupTable[vIndex] = vLookupTable[v.pointTo];
+            skipped++;
         }
+        vIndex++;
     }
 
     // write faces
     int fx, fy, fz;
-    for (auto f: Faces){
-        fx = ( vLookupTable.count(f.x) > 0 ) ? vLookupTable[f.x] : f.x;
-        fy = ( vLookupTable.count(f.y) > 0 ) ? vLookupTable[f.y] : f.y;
-        fz = ( vLookupTable.count(f.z) > 0 ) ? vLookupTable[f.z] : f.z;
+    for (auto f: Faces) {
+        fx = vLookupTable[f.x];
+        fy = vLookupTable[f.y];
+        fz = vLookupTable[f.z];
 
         _fileStreamWrite << "f " << fx << " " << fy << " " << fz << std::endl;
     }
-
     _fileStreamWrite.close();
 }
 
@@ -105,9 +120,13 @@ void ObjFile::summarize() const {
     std::cout << "Faces: " << Faces.size() << std::endl;
 }
 
+/**
+ * Parse the OBJ file line and create Vertex and Face models based on the data.
+ * @param line String contents of the OBJ file line.
+ * @param lineIndex The original index of the line in the original OBJ file.
+ */
 void ObjFile::parseObjLine(const std::string &line, int lineIndex) {
     std::smatch objMatch;
-//    std::regex objRegex(R"(([vf])\s([-\d]+[\d\.]+)\s([-\d]+[\d\.]+)\s([-\d]+[\d\.]+))");
     std::regex objRegex(R"(([vf])\s([-\d\.]+)\s([-\d\.]+)\s([-\d\.]+))");
     std::string type;
 

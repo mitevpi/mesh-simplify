@@ -22,12 +22,23 @@ public:
         return Vertex(std::stod(x), std::stod(y), std::stod(z));
     }
 
+    /**
+     * Low-level method for finding duplicates of a Vertex in an array of Vertices
+     * @param vertexA The vertex to find duplicates of.
+     * @param vertices The array of vertices to search for duplicates in.
+     * @return Whether or not there were any instances of duplication.
+     */
     static bool parseDuplicates(Vertex vertexA, std::vector<Vertex> &vertices) {
         bool duplicated = false;
+
+        // check if it already has been flagged as a duplicate
+        if (vertexA.pointTo > 0){
+            return duplicated;
+        }
         for (Vertex& vertexB : vertices) {
             // if both vertices aren't the same one (based on index) and if the vertex
             // to check has not already been flagged as a duplicate
-            if (vertexB.lineIndex != vertexA.lineIndex && vertexA.pointTo < 1){
+            if (vertexB.lineIndex != vertexA.lineIndex){
                 if (approximatelyEqual(vertexB.x, vertexA.x) && approximatelyEqual(vertexB.y, vertexA.y) &&
                     approximatelyEqual(vertexB.z, vertexA.z)) {
                     vertexB.pointTo = vertexA.lineIndex;
@@ -46,6 +57,7 @@ public:
     static int parseDuplicates(std::vector<Vertex> &vertices) {
         int duplicatedCount = 0;
         for (auto v : vertices) {
+
             bool duplicated = Vertex::parseDuplicates(v, vertices);
 
             if (duplicated){
